@@ -1,3 +1,4 @@
+import { RouteIntro } from "@/components/RouteIntro";
 import { SeatSelection } from "@/components/SeatSelection";
 
 /**
@@ -6,12 +7,14 @@ import { SeatSelection } from "@/components/SeatSelection";
  */
 export default function Page() {
   return (
-    <main className="page">
-      <header>
-        <h1>Grand Theatre</h1>
-        <p className="muted">Choose your seats, hold them, then continue to your own checkout.</p>
-      </header>
+    <>
+      <RouteIntro
+        title="One event with your own cart"
+        question="How do I render the seat map in a Next.js App Router client component and keep my own cart, totals and checkout button?"
+        docsHref="https://docs.seatlayer.io/buyer-sdk/react-seating-chart/"
+        docsLabel="Add a seat map to a React app"
+      />
       <SeatSelection />
-    </main>
+    </>
   );
 }
