@@ -2,7 +2,23 @@
   "name": "seatlayer-nextjs-example",
   "private": true,
   "version": "1.0.0",
-  "description": "Runnable example of the SeatLayer seat map SDK in a Next.js App Router application.",
+  "description": "Open source example code showing how to embed an interactive seat map in a Next.js ticketing app with seat selection, seat holds, best available seats, season tickets and a checkout handoff to your own payment gateway.",
+  "keywords": [
+    "interactive-seat-map",
+    "seat-map",
+    "seating-chart",
+    "seat-picker",
+    "seat-selection",
+    "seat-holds",
+    "best-available-seats",
+    "season-tickets",
+    "reserved-seating",
+    "event-ticketing",
+    "seatlayer",
+    "nextjs",
+    "app-router",
+    "example"
+  ],
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
@@ -11,6 +27,7 @@
   },
   "dependencies": {
     "@seatlayer/react": "0.92.5",
+    "@seatlayer/server": "^0.8.0",
     "next": "15.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0"
