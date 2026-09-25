@@ -26,7 +26,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@seatlayer/react": "0.92.5",
+    "@seatlayer/react": "0.100.0",
     "@seatlayer/server": "^0.8.0",
     "next": "15.1.6",
     "react": "19.0.0",
