@@ -17,6 +17,12 @@ interface SeatLayerEventProps {
   height?: string;
   /** Where buyers go if the script cannot load: your event's booking page. */
   fallbackUrl: string;
+  /**
+   * Bring buyers back to this page after a payment that redirects, such as
+   * Stripe. Your site must be listed under Embed domains in the dashboard;
+   * otherwise buyers finish on the SeatLayer event page.
+   */
+  returnToPage?: boolean;
 }
 
 /**
@@ -24,7 +30,7 @@ interface SeatLayerEventProps {
  * runs the seat map, the payment through your own gateway and the tickets.
  * Try it live: https://seatlayer.io/demo/hosted/paid-event/
  */
-export function SeatLayerEvent({ eventKey, layout = "picker", height = "740px", fallbackUrl }: SeatLayerEventProps) {
+export function SeatLayerEvent({ eventKey, layout = "picker", height = "740px", fallbackUrl, returnToPage = false }: SeatLayerEventProps) {
   useEffect(() => {
     loadSeatLayerScript(WIDGET_SRC, "SeatLayerEvents");
   }, [eventKey]);
@@ -36,6 +42,7 @@ export function SeatLayerEvent({ eventKey, layout = "picker", height = "740px", 
       data-layout={layout}
       data-checkout="hosted"
       data-height={layout === "picker" ? height : undefined}
+      data-return-url={returnToPage ? "page" : undefined}
       data-fallback-url={fallbackUrl}
     >
       <a href={fallbackUrl}>Book tickets on SeatLayer</a>
