@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tickets</title>
+</head>
+<body>
+  <!--
+    Hosted Ticketing: one tag. SeatLayer runs the seat map, the payment through
+    your own gateway, and the tickets.
+    Replace <YOUR_EVENT_KEY> with the key from the event's page in the dashboard.
+    data-layout: picker (the seat map on your page), or card, banner, button.
+    Try it live: https://seatlayer.io/demo/hosted/paid-event/
+  -->
+  <div
+    data-seatlayer-event="<YOUR_EVENT_KEY>"
+    data-layout="picker"
+    data-checkout="hosted"
+    data-height="740px"
+    data-fallback-url="https://app.seatlayer.io/e/<YOUR_EVENT_KEY>">
+    <a href="https://app.seatlayer.io/e/<YOUR_EVENT_KEY>">Book tickets on SeatLayer</a>
+  </div>
+  <script src="https://app.seatlayer.io/sl-event-widget@0.js" defer></script>
+</body>
+</html>
