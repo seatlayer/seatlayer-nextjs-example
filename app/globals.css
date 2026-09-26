@@ -83,6 +83,12 @@ h2 {
   min-height: 420px;
 }
 
+/* The season picker draws its offer and steps above the map, so it takes the
+   height it needs instead of the fixed map height. */
+.seatmap.seatmap--season {
+  height: auto;
+}
+
 .seat-list {
   list-style: none;
   margin: 0 0 12px;
