@@ -3,7 +3,7 @@ import { ControlRoom } from "@/components/ControlRoom";
 
 export default function Page() {
   return (
-    <>
+    <div className="wrap">
       <RouteIntro
         title="The organizer board"
         question="How do staff watch live inventory for one event without an account in my product and without a secret key in the browser?"
@@ -11,6 +11,6 @@ export default function Page() {
         docsLabel="Embedded Control Room"
       />
       <ControlRoom />
-    </>
+    </div>
   );
 }

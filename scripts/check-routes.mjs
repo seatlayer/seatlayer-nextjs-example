@@ -1,7 +1,7 @@
 /**
  * Loads every route in a real browser and fails on an HTTP error, an uncaught
  * exception or a console error. Each route is also loaded with ?embed=1, where
- * the navigation must be hidden.
+ * the header must be hidden.
  *
  *   BASE_URL=http://localhost:3000 node scripts/check-routes.mjs
  *
@@ -11,12 +11,15 @@ import { chromium } from "playwright";
 
 const baseUrl = process.env.BASE_URL ?? "http://localhost:3000";
 
+// Set BASE_PATH when the app was built with SEATLAYER_BASE_PATH.
+const basePath = process.env.BASE_PATH ?? "";
+
 const routes = [
   "/",
   "/seat-picker",
-  "/events",
   "/best-available",
-  "/season",
+  "/season-tickets",
+  "/multiple-events",
   "/checkout-handoff",
   "/control-room",
   "/html",
@@ -34,7 +37,7 @@ for (const route of routes) {
       if (message.type() === "error") problems.push(`console: ${message.text()}`);
     });
 
-    const response = await page.goto(baseUrl + path, { waitUntil: "load" });
+    const response = await page.goto(baseUrl + basePath + path, { waitUntil: "load" });
     if (!response || !response.ok()) {
       problems.push(`HTTP ${response ? response.status() : "no response"}`);
     }
@@ -42,8 +45,8 @@ for (const route of routes) {
     // Give the seat map time to fetch its chart and render.
     await page.waitForTimeout(4000);
 
-    if (path.endsWith("?embed=1") && route !== "/html" && (await page.locator(".nav").isVisible())) {
-      problems.push("navigation is visible in embed mode");
+    if (path.endsWith("?embed=1") && route !== "/html" && (await page.locator(".dh").isVisible())) {
+      problems.push("header is visible in embed mode");
     }
 
     console.log(`${problems.length ? "FAIL" : "ok  "} ${path}`);

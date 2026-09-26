@@ -1,17 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import type { BestAvailableResult, SeatingChartHandle } from "@seatlayer/react";
+import { HoldCountdown } from "@/components/HoldCountdown";
+import { Icon } from "@/components/Icon";
 import { SetupNotice } from "@/components/SetupNotice";
 import { eventKey, isConfigured } from "@/lib/config";
 
 const EventChart = dynamic(() => import("@/components/EventChart").then((m) => m.EventChart), {
   ssr: false,
-  loading: () => <p className="muted">Loading the seat map</p>,
+  loading: () => <p className="demo-loading">Loading the seat map</p>,
 });
-
-const quantities = [1, 2, 3, 4, 5, 6, 7, 8];
 
 /**
  * Best available for a group.
@@ -19,34 +19,30 @@ const quantities = [1, 2, 3, 4, 5, 6, 7, 8];
  * `bestAvailable(quantity, categoryKey?)` asks the server to find an adjacent
  * block and hold it in the same call. It resolves to null when no such block
  * exists, which is not the same answer as sold out, so the two are worded
- * differently below.
- *
- * The category filter is a plain field: the buyer SDK exposes the category on
- * each selected seat, not a list of the chart's categories, so the stable
- * category key from the published chart is typed in.
+ * differently below. Pass a category key from your published chart as the
+ * second argument to search one price band only.
  */
 export function BestAvailableFlow() {
   const chartRef = useRef<SeatingChartHandle>(null);
-  const [quantity, setQuantity] = useState(4);
-  const [categoryKey, setCategoryKey] = useState("");
+  const [quantity, setQuantity] = useState(2);
   const [result, setResult] = useState<BestAvailableResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const expire = useCallback(() => {
+    setResult(null);
+    setError("The hold ran out. Ask for seats again.");
+  }, []);
+
   async function findGroup() {
     setBusy(true);
     setError(null);
-    setResult(null);
     try {
-      const key = categoryKey.trim();
-      const found = await chartRef.current?.bestAvailable(
-        quantity,
-        key.length > 0 ? key : undefined,
-      );
+      if (result) await chartRef.current?.release();
+      setResult(null);
+      const found = await chartRef.current?.bestAvailable(quantity);
       if (!found) {
-        setError(
-          `No block of ${quantity} seats together is available right now. Try a smaller group or another category.`,
-        );
+        setError(`No block of ${quantity} seats together is free right now. Try a smaller group.`);
         return;
       }
       setResult(found);
@@ -55,6 +51,11 @@ export function BestAvailableFlow() {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function release() {
+    await chartRef.current?.release();
+    setResult(null);
   }
 
   if (!isConfigured) {
@@ -66,63 +67,47 @@ export function BestAvailableFlow() {
   }
 
   return (
-    <div className="layout">
-      <section className="map-panel">
-        <EventChart
-          ref={chartRef}
-          eventKey={eventKey}
-          onSelectionChange={() => undefined}
-          onHold={() => undefined}
-          onHoldExpired={() => undefined}
-          onError={setError}
-        />
-      </section>
-
-      <aside className="cart-panel">
-        <h2>Find seats together</h2>
-        <label className="field">
-          <span>How many seats</span>
-          <select value={quantity} onChange={(event) => setQuantity(Number(event.target.value))}>
-            {quantities.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field">
-          <span>Category key (optional)</span>
-          <input
-            type="text"
-            value={categoryKey}
-            placeholder="stalls"
-            onChange={(event) => setCategoryKey(event.target.value)}
-          />
-        </label>
-        <div className="actions">
-          <button type="button" className="primary" disabled={busy} onClick={() => void findGroup()}>
-            Find and hold
+    <section className="demo-frame demo-frame--bar" aria-label="Best available demo">
+      <div className="demo-bar">
+        <div className="qty" role="group" aria-label="How many seats">
+          <span className="qty-label">How many seats</span>
+          <button type="button" aria-label="Fewer seats" disabled={quantity <= 1} onClick={() => setQuantity((q) => q - 1)}>
+            <Icon name="minus" />
+          </button>
+          <b className="mono" aria-live="polite">{quantity}</b>
+          <button type="button" aria-label="More seats" disabled={quantity >= 8} onClick={() => setQuantity((q) => q + 1)}>
+            <Icon name="plus" />
           </button>
         </div>
-
-        {result ? (
-          <div>
-            <p className="total">
-              <span>Held</span>
-              <span>{result.labels.length} seats</span>
-            </p>
-            <ul className="seat-list">
-              {result.labels.map((label) => (
-                <li key={label}>
-                  <span>{label}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="muted small">Hold id: {result.holdId}</p>
-          </div>
-        ) : null}
-        {error ? <p className="error">{error}</p> : null}
-      </aside>
-    </div>
+        <button type="button" className="btn btn-amber" disabled={busy} onClick={() => void findGroup()}>
+          {busy ? "Finding seats" : `Find ${quantity} best ${quantity === 1 ? "seat" : "seats"}`}
+        </button>
+        <div className="bar-result" aria-live="polite">
+          {result ? (
+            <>
+              <span className="bar-seats">
+                Held: <b>{result.labels.join(", ")}</b>
+              </span>
+              <HoldCountdown expiresAt={result.expiresAt} onExpired={expire} />
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => void release()}>
+                Release
+              </button>
+            </>
+          ) : error ? (
+            <span className="error">{error}</span>
+          ) : (
+            <span className="muted">SeatLayer finds the best seats next to each other and holds them.</span>
+          )}
+        </div>
+      </div>
+      <EventChart
+        ref={chartRef}
+        eventKey={eventKey}
+        onSelectionChange={() => undefined}
+        onHold={() => undefined}
+        onHoldExpired={expire}
+        onError={setError}
+      />
+    </section>
   );
 }

@@ -23,14 +23,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "deploy:hosted": "opennextjs-cloudflare build && opennextjs-cloudflare deploy --env hosted",
-    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+    "start": "next start"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "1.20.6",
     "@seatlayer/react": "0.100.0",
     "@seatlayer/server": "^0.8.0",
     "next": "15.5.26",
@@ -41,7 +36,6 @@
     "@types/node": "22.10.5",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
-    "typescript": "5.6.3",
-    "wrangler": "4.141.0"
+    "typescript": "5.6.3"
   }
 }

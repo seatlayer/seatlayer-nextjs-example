@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>What's on</title>
+</head>
+<body>
+  <!--
+    Every upcoming public event in one workspace, on your page. Buyers pick a
+    date, then their seats. Only events you list publicly appear.
+    Replace <YOUR_WORKSPACE_ID> (ws_...) with your workspace id.
+    Optional: data-layout="list" or "calendar".
+    Try it live: https://seatlayer.io/demo/hosted/multi-date/
+  -->
+  <div data-seatlayer-collection="<YOUR_WORKSPACE_ID>">
+    <a class="slc-fallback" href="https://app.seatlayer.io/e/<YOUR_EVENT_KEY>">View tickets on SeatLayer</a>
+  </div>
+  <script src="https://app.seatlayer.io/sl-event-collection@0.js" defer></script>
+</body>
+</html>
