@@ -7,8 +7,3 @@ dist
 *.log
 *.tsbuildinfo
 
-# Cloudflare Workers (OpenNext)
-.open-next
-.wrangler
-.dev.vars
-cloudflare-env.d.ts
