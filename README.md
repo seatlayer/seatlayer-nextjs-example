@@ -251,6 +251,23 @@ command and `npx opennextjs-cloudflare deploy` as the deploy command. Set the
 the bundle at build time, and set `SEATLAYER_SECRET_KEY` as a secret on the
 worker.
 
+`npm run deploy` creates your own Worker named `seatlayer-nextjs-example`, with
+no custom domain. Rename it in `wrangler.jsonc` if you like.
+
+### Hosting our copy
+
+The live demo at examples.seatlayer.io is this repository deployed with the
+`hosted` environment in `wrangler.jsonc`, which sets the Worker name
+`seatlayer-examples`, the custom domain and the matching
+`WORKER_SELF_REFERENCE` service:
+
+```sh
+npm run deploy:hosted
+```
+
+Its `NEXT_PUBLIC_` variables are set at build time and `SEATLAYER_SECRET_KEY`
+is a Worker secret. You do not need this environment for your own copy.
+
 Two extras help when the examples are shown inside another page:
 
 - Add `?embed=1` to any route to hide the navigation and the route heading, so
