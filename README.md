@@ -262,11 +262,19 @@ The live demo at examples.seatlayer.io is this repository deployed with the
 `WORKER_SELF_REFERENCE` service:
 
 ```sh
+NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY=pk_test_e5933c35b56d4f9997f89d50edca3aa3e610c6ff92c8480f \
+NEXT_PUBLIC_SEATLAYER_EVENT_KEY=ev_dd43d9250d37406a8d630158d57f1db6 \
+NEXT_PUBLIC_SEATLAYER_EVENT_KEY_2=ev_38327c4f7d8c433281fa330033f6376b \
+NEXT_PUBLIC_SEATLAYER_EVENT_KEY_3=ev_73621397e3c64d398d24e1b84f08c2d3 \
+NEXT_PUBLIC_SEATLAYER_SEASON_KEY=sea_030bee1677b247c1957c0f372d92d613 \
+NEXT_PUBLIC_SEATLAYER_CURRENCY=EUR \
 npm run deploy:hosted
 ```
 
-Its `NEXT_PUBLIC_` variables are set at build time and `SEATLAYER_SECRET_KEY`
-is a Worker secret. You do not need this environment for your own copy.
+These are the public demo keys (a test event, safe in browser code). The
+`NEXT_PUBLIC_` values are written into the build, so they must be set on the
+command line as above. `SEATLAYER_SECRET_KEY` is a secret on the Worker and is
+never passed here. You do not need this environment for your own copy.
 
 Two extras help when the examples are shown inside another page:
 
