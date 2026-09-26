@@ -7,6 +7,16 @@ payment gateway. Every example is an App Router route in one small application,
 and each one names the question it answers and links the matching documentation
 page.
 
+## Live demos
+
+Try SeatLayer in your browser before you clone anything:
+[pick a seat](https://app.seatlayer.io/demo/play/grand-theatre) · [the 3D venue](https://app.seatlayer.io/demo/play/grand-theatre?tour=3d) ·
+[the chart designer](https://app.seatlayer.io/demo/designer) ·
+[all live demos](https://docs.seatlayer.io/start/live-demos/).
+Those demos run on a template chart with no server event behind them, so a
+hold there is not real. This repository gives you real test holds and
+bookings with your own test keys.
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/seatlayer/seatlayer-nextjs-example)
 
 ## Run it
@@ -21,8 +31,8 @@ npm run dev
 
 | Variable | What it is |
 | --- | --- |
-| `NEXT_PUBLIC_SEATLAYER_EVENT_KEY` | The event you want to sell, for example `ev_9f3a` |
-| `NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY` | The publishable `pk_` key for the same account |
+| `NEXT_PUBLIC_SEATLAYER_EVENT_KEY` | Your event key. It starts with `ev_` and is at the top of the event's page in the dashboard, with a Copy button |
+| `NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY` | Your public key (`pk_test_…` in test mode) from Developer → API keys, from the same account as the event |
 
 The rest are optional. `NEXT_PUBLIC_SEATLAYER_EVENT_KEY_2` and
 `NEXT_PUBLIC_SEATLAYER_EVENT_KEY_3` give the multiple events route real variety,
@@ -32,8 +42,7 @@ Every route shows a setup notice instead of a chart until its keys are present,
 so the repository runs the moment it is cloned.
 
 Test mode is free, so you can run every step above before a live account exists.
-Register `http://localhost:3000` as an embed origin for the key, otherwise the
-chart will refuse to bootstrap. Never put a secret `sk_` key in browser code.
+Never put a secret `sk_` key in browser code.
 
 ## Examples in this repo
 
@@ -207,7 +216,7 @@ import { SeatingChart } from "@seatlayer/react";
 
 <SeatingChart
   ref={chartRef}
-  event="ev_9f3a"
+  event="<YOUR_EVENT_KEY>"
   publicKey="pk_test_..."
   currency="USD"
   onSelectionChange={setSeats}
