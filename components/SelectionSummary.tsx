@@ -1,5 +1,5 @@
 import type { SelectedSeat } from "@seatlayer/react";
-import { formatUsd } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 
 interface SelectionSummaryProps {
   seats: SelectedSeat[];
@@ -17,7 +17,7 @@ export function SelectionSummary({ seats, total }: SelectionSummaryProps) {
         {seats.map((seat) => (
           <li key={seat.id}>
             <span>{describe(seat)}</span>
-            <span className="price">{formatUsd(seat.price ?? 0)}</span>
+            <span className="price">{formatMoney(seat.price ?? 0)}</span>
           </li>
         ))}
       </ul>
@@ -25,7 +25,7 @@ export function SelectionSummary({ seats, total }: SelectionSummaryProps) {
         <span>
           Total for {seats.length} {seats.length === 1 ? "seat" : "seats"}
         </span>
-        <span className="price">{formatUsd(total)}</span>
+        <span className="price">{formatMoney(total)}</span>
       </p>
     </div>
   );
