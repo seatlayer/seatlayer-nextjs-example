@@ -11,9 +11,12 @@
     date, then their seats. Only events you list publicly appear.
     Replace <YOUR_WORKSPACE_ID> (ws_...) with your workspace id.
     Optional: data-layout="list" or "calendar".
+    data-return-url="page" brings buyers back to this page after a payment that
+    redirects, such as Stripe. List your site under Embed domains in the
+    dashboard; otherwise buyers finish on the SeatLayer event page.
     Try it live: https://seatlayer.io/demo/hosted/multi-date/
   -->
-  <div data-seatlayer-collection="<YOUR_WORKSPACE_ID>">
+  <div data-seatlayer-collection="<YOUR_WORKSPACE_ID>" data-return-url="page">
     <a class="slc-fallback" href="https://app.seatlayer.io/e/<YOUR_EVENT_KEY>">View tickets on SeatLayer</a>
   </div>
   <script src="https://app.seatlayer.io/sl-event-collection@0.js" defer></script>

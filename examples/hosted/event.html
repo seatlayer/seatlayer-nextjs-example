@@ -11,6 +11,9 @@
     your own gateway, and the tickets.
     Replace <YOUR_EVENT_KEY> with the key from the event's page in the dashboard.
     data-layout: picker (the seat map on your page), or card, banner, button.
+    data-return-url="page" brings buyers back to this page after a payment that
+    redirects, such as Stripe. List your site under Embed domains in the
+    dashboard; otherwise buyers finish on the SeatLayer event page.
     Try it live: https://seatlayer.io/demo/hosted/paid-event/
   -->
   <div
@@ -18,6 +21,7 @@
     data-layout="picker"
     data-checkout="hosted"
     data-height="740px"
+    data-return-url="page"
     data-fallback-url="https://app.seatlayer.io/e/<YOUR_EVENT_KEY>">
     <a href="https://app.seatlayer.io/e/<YOUR_EVENT_KEY>">Book tickets on SeatLayer</a>
   </div>

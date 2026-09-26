@@ -11,6 +11,12 @@ interface SeatLayerCollectionProps {
   layout?: "grid" | "list" | "calendar";
   /** Where buyers go if the script cannot load. */
   fallbackUrl: string;
+  /**
+   * Bring buyers back to this page after a payment that redirects, such as
+   * Stripe. Your site must be listed under Embed domains in the dashboard;
+   * otherwise buyers finish on the SeatLayer event page.
+   */
+  returnToPage?: boolean;
 }
 
 /**
@@ -18,7 +24,7 @@ interface SeatLayerCollectionProps {
  * pick a date, then their seats. Only events you list publicly appear.
  * Try it live: https://seatlayer.io/demo/hosted/multi-date/
  */
-export function SeatLayerCollection({ workspaceId, layout = "grid", fallbackUrl }: SeatLayerCollectionProps) {
+export function SeatLayerCollection({ workspaceId, layout = "grid", fallbackUrl, returnToPage = false }: SeatLayerCollectionProps) {
   useEffect(() => {
     loadSeatLayerScript(COLLECTION_SRC, "SeatLayerCollections");
   }, [workspaceId]);
@@ -28,6 +34,7 @@ export function SeatLayerCollection({ workspaceId, layout = "grid", fallbackUrl 
       key={workspaceId}
       data-seatlayer-collection={workspaceId}
       data-layout={layout === "grid" ? undefined : layout}
+      data-return-url={returnToPage ? "page" : undefined}
     >
       <a className="slc-fallback" href={fallbackUrl}>
         View tickets on SeatLayer
