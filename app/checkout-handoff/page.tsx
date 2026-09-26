@@ -40,8 +40,8 @@ export default function Page() {
             path runs only when <code>SEATLAYER_SECRET_KEY</code> is set.
           </li>
           <li>
-            <code>app/api/events/route.ts</code> serves the event list, and reads the real
-            catalogue with the same key when it is present.
+            <code>app/api/events/route.ts</code> serves the events you configure, and reads
+            their real names with the same key when it is present.
           </li>
           <li>
             <code>components/SeatPickerFlow.tsx</code> is the browser side that produces the

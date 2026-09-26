@@ -9,6 +9,9 @@ const nextConfig = {
       ...(config.ignoreWarnings ?? []),
       { module: /@seatlayer[\\/]js/, message: /Critical dependency/ },
     ];
+    // Lets app/html/route.ts import app/html/index.html as a string, so the
+    // template stays a plain HTML file you can copy as it is.
+    config.module.rules.push({ test: /\.html$/, type: "asset/source" });
     return config;
   },
 };
