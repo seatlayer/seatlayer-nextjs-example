@@ -18,6 +18,10 @@ export function Nav() {
           {route.label}
         </Link>
       ))}
+      {/* A route handler rather than a page, so a plain link loads it. */}
+      <a href="/html" className="nav-link">
+        Plain HTML
+      </a>
     </nav>
   );
 }
