@@ -7,6 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Repository secrets for a test event. Forks do not have them, so there
+      # the job only builds and the route checks are skipped.
+      NEXT_PUBLIC_SEATLAYER_EVENT_KEY: ${{ secrets.DEMO_EVENT_KEY }}
+      NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY: ${{ secrets.DEMO_PUBLIC_KEY }}
+      NEXT_PUBLIC_SEATLAYER_SEASON_KEY: ${{ secrets.DEMO_SEASON_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -14,3 +20,16 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm run build
+
+      - name: Install the route check browser
+        if: env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY != '' && env.NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY != ''
+        run: |
+          npm install --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Load every route
+        if: env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY != '' && env.NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY != ''
+        run: |
+          npm start &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000 > /dev/null && break; sleep 2; done
+          node scripts/check-routes.mjs

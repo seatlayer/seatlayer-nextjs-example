@@ -88,8 +88,8 @@ the `event` prop rebuilds the canvas, because a different event is different
 inventory. Release any open hold before switching, otherwise those seats stay
 off the market on the previous event until they expire on their own. See
 `components/EventSwitcher.tsx` and the route handler at
-`app/api/events/route.ts`, which serves static configuration and reads the real
-catalogue with the Node server SDK when a secret key is present.
+`app/api/events/route.ts`, which shows the events you configure and reads their
+real names with the Node server SDK when a secret key is present.
 
 ### How do I offer best available seats for a group?
 
@@ -232,6 +232,37 @@ and countdown.
 - [Vue](https://docs.seatlayer.io/buyer-sdk/vue/) and [Angular](https://docs.seatlayer.io/buyer-sdk/angular/)
 - [Node server SDK](https://docs.seatlayer.io/server-sdk/node/)
 - [seatlayer-sdk on GitHub](https://github.com/seatlayer/seatlayer-sdk)
+
+## Hosting on Cloudflare
+
+The app also runs on Cloudflare Workers through the
+[OpenNext adapter](https://opennext.js.org/cloudflare). `npm run build` stays a
+plain Next.js build, so Vercel and `npm start` work as before.
+
+```sh
+npm run preview   # build for Workers and run it locally
+npm run deploy    # build for Workers and deploy with Wrangler
+```
+
+The worker is configured in `wrangler.jsonc` and `open-next.config.ts`. With
+Cloudflare Workers Builds, use `npx opennextjs-cloudflare build` as the build
+command and `npx opennextjs-cloudflare deploy` as the deploy command. Set the
+`NEXT_PUBLIC_` variables as build variables, because Next.js writes them into
+the bundle at build time, and set `SEATLAYER_SECRET_KEY` as a secret on the
+worker.
+
+Two extras help when the examples are shown inside another page:
+
+- Add `?embed=1` to any route to hide the navigation and the route heading, so
+  the example sits cleanly in an iframe.
+- `/html` serves the seat picker as a plain HTML page with the script tag
+  install. The page is `app/html/index.html`, and the route fills in its
+  `<YOUR_EVENT_KEY>` and `<YOUR_PUBLIC_KEY>` placeholders from your environment.
+
+CI builds every push. When the repository has `DEMO_EVENT_KEY` and
+`DEMO_PUBLIC_KEY` secrets (and optionally `DEMO_SEASON_KEY`), it also starts the
+app and loads every route with `scripts/check-routes.mjs`, failing on an HTTP
+error or a console error.
 
 ## License
 
