@@ -6,6 +6,15 @@ import type { HoldResult, SeatingChartHandle, SelectedSeat } from "@seatlayer/re
 import { SelectionSummary } from "@/components/SelectionSummary";
 import { HoldCountdown } from "@/components/HoldCountdown";
 import { isConfigured } from "@/lib/config";
+import { formatMoney } from "@/lib/money";
+
+/** A line of the hold as your server read it back from SeatLayer. */
+interface ServerLine {
+  label: string;
+  unitPrice: number;
+  currency: string;
+  quantity?: number;
+}
 
 /** The chart is browser only, so it is loaded without server rendering. */
 const SeatMap = dynamic(() => import("@/components/SeatMap").then((m) => m.SeatMap), {
@@ -19,6 +28,8 @@ export function SeatSelection() {
   const [hold, setHold] = useState<HoldResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [serverLines, setServerLines] = useState<ServerLine[] | null>(null);
+  const [booking, setBooking] = useState<{ booked: string[]; bookingRef: string } | null>(null);
 
   const total = useMemo(
     () => seats.reduce((sum, seat) => sum + (seat.price ?? 0), 0),
@@ -39,6 +50,7 @@ export function SeatSelection() {
 
   const handleExpired = useCallback(() => {
     setHold(null);
+    setServerLines(null);
     setError("Your hold expired. Pick your seats again.");
   }, []);
 
@@ -50,6 +62,7 @@ export function SeatSelection() {
         setError("Those seats were just taken. Please pick again.");
         return;
       }
+      setBooking(null);
       setHold(result);
     });
 
@@ -61,6 +74,7 @@ export function SeatSelection() {
         setError("No block of that size is free right now.");
         return;
       }
+      setBooking(null);
       setHold({ holdId: result.holdId, expiresAt: result.expiresAt, items: result.items });
     });
 
@@ -68,11 +82,12 @@ export function SeatSelection() {
     run(async () => {
       await chartRef.current?.release();
       setHold(null);
+      setServerLines(null);
     });
 
   /**
-   * Hand the hold id to the server route, which is where your own checkout
-   * session would be created before the hold is booked.
+   * Step 1 of checkout: hand the hold id to your server, which reads the seats
+   * and prices back from SeatLayer. The browser never sends a price.
    */
   const continueToCheckout = () =>
     run(async () => {
@@ -83,7 +98,35 @@ export function SeatSelection() {
         body: JSON.stringify({ holdId: hold.holdId }),
       });
       const payload = await response.json();
-      console.log("Continue to checkout with hold id:", hold.holdId, payload);
+      if (!response.ok || !payload.inspected) {
+        setError(payload.next ?? payload.error ?? "Your server could not read the hold.");
+        return;
+      }
+      setServerLines(payload.items as ServerLine[]);
+    });
+
+  /**
+   * Step 2: once payment has succeeded, book the hold with your own order id.
+   * This example skips the payment itself.
+   */
+  const payAndBook = () =>
+    run(async () => {
+      if (!hold) return;
+      const orderId = `order_${Date.now().toString(36)}`;
+      const response = await fetch("/api/hold", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ holdId: hold.holdId, orderId }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.booked) {
+        setError(payload.error ?? "The booking did not go through. Your seats are still held.");
+        return;
+      }
+      setBooking({ booked: payload.booked, bookingRef: payload.bookingRef });
+      setHold(null);
+      setServerLines(null);
+      setSeats([]);
     });
 
   if (!isConfigured) {
@@ -124,9 +167,11 @@ export function SeatSelection() {
 
           {hold ? (
             <>
-              <button type="button" className="primary" onClick={continueToCheckout} disabled={busy}>
-                Continue to checkout
-              </button>
+              {serverLines ? null : (
+                <button type="button" className="primary" onClick={continueToCheckout} disabled={busy}>
+                  Continue to checkout
+                </button>
+              )}
               <button type="button" onClick={releaseHold} disabled={busy}>
                 Release seats
               </button>
@@ -144,6 +189,34 @@ export function SeatSelection() {
         </div>
 
         {hold ? <p className="muted small">Hold id: {hold.holdId}</p> : null}
+
+        {serverLines ? (
+          <section className="checkout-step" data-testid="server-check">
+            <h3>Your server read the hold back</h3>
+            <ul>
+              {serverLines.map((line) => (
+                <li key={line.label}>
+                  <span>{line.label}</span>
+                  <span className="price">{formatMoney(line.unitPrice * (line.quantity ?? 1), line.currency)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="muted small">
+              These prices come from SeatLayer, not the browser. Charge this amount, then book.
+            </p>
+            <button type="button" className="primary" onClick={payAndBook} disabled={busy}>
+              Pay (test) and book
+            </button>
+          </section>
+        ) : null}
+
+        {booking ? (
+          <section className="checkout-step" data-testid="booking">
+            <h3>Booked</h3>
+            <p>{booking.booked.join(", ")}</p>
+            <p className="muted small">Booking reference: {booking.bookingRef}</p>
+          </section>
+        ) : null}
       </aside>
     </div>
   );

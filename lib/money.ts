@@ -1,13 +1,11 @@
-/**
- * Seat prices arrive in major currency units, so 45 means $45.00.
- */
-const formatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
+import { currency as eventCurrency } from "@/lib/config";
 
-export function formatUsd(amount: number): string {
-  return formatter.format(amount);
+/**
+ * Seat prices arrive in major currency units, so 45 means 45.00 in the
+ * event's currency.
+ */
+export function formatMoney(amount: number, currency: string = eventCurrency): string {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 }
 
 export function formatClock(msRemaining: number): string {
