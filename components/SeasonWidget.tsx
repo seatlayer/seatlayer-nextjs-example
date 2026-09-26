@@ -30,7 +30,7 @@ export const SeasonWidget = forwardRef<SeasonPickerHandle, SeasonWidgetProps>(fu
       season={seasonKey}
       publicKey={publicKey}
       maxSelection={4}
-      className="seatmap"
+      className="seatmap seatmap--season"
       offer={{
         eyebrow: "2027 membership",
         priceLabel: "From $480",
