@@ -109,8 +109,8 @@ export function EventSwitcher() {
         </div>
         {hold ? <p className="muted small">Hold id: {hold.holdId}</p> : null}
         <p className="muted">
-          The list comes from <code>app/api/events/route.ts</code>, which serves static
-          configuration and reads the real catalogue with the server SDK when a secret key is
+          The list comes from <code>app/api/events/route.ts</code>, which shows the events
+          you configure and reads their real names with the server SDK when a secret key is
           present.
         </p>
       </aside>
