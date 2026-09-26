@@ -12,7 +12,7 @@ export function SelectionSummary({ seats, total }: SelectionSummaryProps) {
   }
 
   return (
-    <div>
+    <div className="summary">
       <ul className="seat-list">
         {seats.map((seat) => (
           <li key={seat.id}>
@@ -33,6 +33,6 @@ export function SelectionSummary({ seats, total }: SelectionSummaryProps) {
 
 function describe(seat: SelectedSeat): string {
   const parts = [seat.sectionLabel, seat.rowLabel && `Row ${seat.rowLabel}`, seat.seatNumber && `Seat ${seat.seatNumber}`];
-  const address = parts.filter(Boolean).join(" ");
+  const address = parts.filter(Boolean).join(" · ");
   return address.length > 0 ? address : seat.displayLabel ?? seat.label;
 }

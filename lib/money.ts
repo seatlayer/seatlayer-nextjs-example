@@ -5,7 +5,7 @@ import { currency as eventCurrency } from "@/lib/config";
  * event's currency.
  */
 export function formatMoney(amount: number, currency: string = eventCurrency): string {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+  return new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amount);
 }
 
 export function formatClock(msRemaining: number): string {

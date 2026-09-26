@@ -2,156 +2,75 @@
 
 import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import type {
-  SeasonAvailability,
-  SeasonCheckoutHandoff,
-  SeasonDescriptor,
-  SeasonPickerHandle,
-  SeasonRenewalIntent,
-} from "@seatlayer/react";
+import type { SeasonCheckoutHandoff, SeasonDescriptor, SeasonPickerHandle } from "@seatlayer/react";
+import { HandoffTable } from "@/components/HandoffTable";
 import { SetupNotice } from "@/components/SetupNotice";
 import { isSeasonConfigured } from "@/lib/config";
 
 const SeasonWidget = dynamic(() => import("@/components/SeasonWidget").then((m) => m.SeasonWidget), {
   ssr: false,
-  loading: () => <p className="muted">Loading the season</p>,
+  loading: () => <p className="demo-loading">Loading the season</p>,
 });
 
-/** Caller-stable ids let an interrupted operation be recovered rather than repeated. */
-function newActionId(): string {
-  return crypto.randomUUID();
-}
-
+/**
+ * Season tickets: one seat choice held across every performance.
+ *
+ * Returning holders renew from an offer your server issued: call
+ * `pickerRef.current.createRenewalIntent(offerId)` with the `sro_` offer id.
+ * That records intent only. It never confirms a price or takes payment, so it
+ * belongs in your own account area rather than on a public page.
+ */
 export function SeasonFlow() {
   const pickerRef = useRef<SeasonPickerHandle>(null);
   const [descriptor, setDescriptor] = useState<SeasonDescriptor | null>(null);
-  const [availability, setAvailability] = useState<SeasonAvailability | null>(null);
   const [handoff, setHandoff] = useState<SeasonCheckoutHandoff | null>(null);
-  const [renewal, setRenewal] = useState<SeasonRenewalIntent | null>(null);
-  const [offerId, setOfferId] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  /** A returning holder records intent to renew. It is intent only, never a sale. */
-  async function recordRenewalIntent() {
-    setError(null);
-    try {
-      const intent = await pickerRef.current?.createRenewalIntent(offerId.trim());
-      setRenewal(intent ?? null);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "The renewal offer could not be read");
-    }
-  }
-
   if (!isSeasonConfigured) {
-    return <SetupNotice variables={["NEXT_PUBLIC_SEATLAYER_SEASON_KEY"]} />;
+    return <SetupNotice variables={["NEXT_PUBLIC_SEATLAYER_SEASON_KEY", "NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY"]} />;
   }
 
   return (
-    <div className="layout">
-      <section className="map-panel">
+    <>
+      <section className="demo-frame" aria-label="Season tickets demo">
         <SeasonWidget
           ref={pickerRef}
           onStatusChange={(event) => {
-            setStatus(event.message);
-            if (event.kind === "ready") {
-              setDescriptor(pickerRef.current?.getDescriptor() ?? null);
-              setAvailability(pickerRef.current?.getAvailability() ?? null);
-            }
+            if (event.kind === "ready") setDescriptor(pickerRef.current?.getDescriptor() ?? null);
           }}
-          onHandoff={setHandoff}
+          onHandoff={(next) => {
+            setError(null);
+            setHandoff(next);
+          }}
           onHoldExpired={() => {
             setHandoff(null);
-            setError("The season hold expired. Choose your seats again.");
+            setError("The season hold ran out. Choose your seats again.");
           }}
           onError={setError}
         />
       </section>
-
-      <aside className="cart-panel">
-        <h2>Season package</h2>
-        {descriptor ? (
-          <ul className="seat-list">
-            <li>
-              <span>Season</span>
-              <span>{descriptor.name}</span>
-            </li>
-            <li>
-              <span>Venue</span>
-              <span>{descriptor.venue}</span>
-            </li>
-            <li>
-              <span>Performances</span>
-              <span>{descriptor.occurrenceCount}</span>
-            </li>
-          </ul>
-        ) : (
-          <p className="muted">{status ?? "Loading the published plan."}</p>
-        )}
-
-        {availability ? (
-          <p className="muted">
-            {availability.freeCount} seats are free for every performance in the plan,{" "}
-            {availability.blockedCount} are not.
-          </p>
-        ) : null}
-
-        {handoff ? (
-          <div>
-            <p className="total">
-              <span>Held</span>
-              <span>{handoff.allocations.length} performances</span>
-            </p>
-            <p className="muted small">Operation id: {handoff.operationId}</p>
-            <p className="muted">
-              The handoff carries no price. Your server inspects the operation, prices the
-              package, charges through your own payment gateway, then books it.
-            </p>
-            <div className="actions">
-              <button
-                type="button"
-                onClick={() => {
-                  void pickerRef.current?.release(newActionId());
-                  setHandoff(null);
-                }}
-              >
-                Release the package
-              </button>
-            </div>
-          </div>
-        ) : null}
-
-        <h2>Returning holder</h2>
-        <p className="muted">
-          A holder who already has these seats renews from an offer your server issued.
-          Recording intent does not confirm a price or take payment.
-        </p>
-        <label className="field">
-          <span>Renewal offer id</span>
-          <input
-            type="text"
-            value={offerId}
-            placeholder="sro_..."
-            onChange={(event) => setOfferId(event.target.value)}
-          />
-        </label>
-        <div className="actions">
-          <button
-            type="button"
-            disabled={offerId.trim().length === 0}
-            onClick={() => void recordRenewalIntent()}
-          >
-            Record renewal intent
-          </button>
-        </div>
-        {renewal ? (
-          <p className="muted small">
-            Intent {renewal.intentId} recorded, state {renewal.state}.
-          </p>
-        ) : null}
-
-        {error ? <p className="error">{error}</p> : null}
-      </aside>
-    </div>
+      {error ? <p className="error">{error}</p> : null}
+      <HandoffTable
+        title="What your checkout gets"
+        note="After the buyer continues"
+        empty={
+          descriptor
+            ? `Pick seats for ${descriptor.name} and continue. What your checkout receives appears here.`
+            : "Pick seats and continue. What your checkout receives appears here."
+        }
+        rows={
+          handoff
+            ? [
+                { field: "operationId", value: "The season hold. Send only this to your server." },
+                {
+                  field: "allocations",
+                  value: `${handoff.allocations.length} performances, the same seats in each`,
+                },
+                { field: "price", value: "None. Your server prices the package, then books it." },
+              ]
+            : null
+        }
+      />
+    </>
   );
 }

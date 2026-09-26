@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Icon } from "@/components/Icon";
 import { formatClock } from "@/lib/money";
 
 interface HoldCountdownProps {
@@ -31,7 +32,8 @@ export function HoldCountdown({ expiresAt, onExpired }: HoldCountdownProps) {
 
   return (
     <p className="countdown">
-      Seats held for <strong>{formatClock(remaining)}</strong>
+      <Icon name="clock" />
+      Seats held for <strong className="mono">{formatClock(remaining)}</strong>
     </p>
   );
 }
