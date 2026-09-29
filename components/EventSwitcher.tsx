@@ -6,7 +6,7 @@ import type { HoldResult, SeatingChartHandle, SelectedSeat } from "@seatlayer/re
 import { HoldCountdown } from "@/components/HoldCountdown";
 import { SelectionSummary } from "@/components/SelectionSummary";
 import { SetupNotice } from "@/components/SetupNotice";
-import { isConfigured } from "@/lib/config";
+import { configuredEvents, isConfigured } from "@/lib/config";
 import { withBase } from "@/lib/site";
 import type { EventOption } from "@/app/api/events/route";
 
@@ -24,8 +24,10 @@ const EventChart = dynamic(() => import("@/components/EventChart").then((m) => m
  */
 export function EventSwitcher() {
   const chartRef = useRef<SeatingChartHandle>(null);
-  const [events, setEvents] = useState<EventOption[]>([]);
-  const [selected, setSelected] = useState<EventOption | null>(null);
+  // The keys are public config, so the first map loads at once; the route only
+  // brings the real names.
+  const [events, setEvents] = useState<EventOption[]>(configuredEvents);
+  const [selected, setSelected] = useState<EventOption | null>(configuredEvents[0] ?? null);
   const [seats, setSeats] = useState<SelectedSeat[]>([]);
   const [hold, setHold] = useState<HoldResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +38,15 @@ export function EventSwitcher() {
       .then((response) => response.json())
       .then((payload: { events: EventOption[] }) => {
         if (!active) return;
-        setEvents(payload.events);
-        setSelected(payload.events[0] ?? null);
+        // Rename in place: the same event at the same position keeps its map
+        // (and any hold on it) instead of loading it again.
+        const named = new Map(payload.events.map((event) => [event.key, event.name]));
+        const renamed = configuredEvents.map((event) => ({ ...event, name: named.get(event.key) ?? event.name }));
+        setEvents(renamed);
+        setSelected((current) => (current ? renamed[configuredEvents.indexOf(current)] ?? current : current));
       })
-      .catch(() => setError("The event list could not be loaded."));
+      // The placeholder names stay; the maps work without the real ones.
+      .catch(() => undefined);
     return () => {
       active = false;
     };

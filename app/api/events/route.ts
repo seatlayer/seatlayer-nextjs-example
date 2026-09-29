@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eventKey } from "@/lib/config";
+import { configuredEvents } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ export interface EventOption {
  * The event list for the multiple events page.
  *
  * The route shows only the events you configure, never your whole account.
- * Without a secret key it serves them with the placeholder names below. When
+ * Without a secret key it serves them with their placeholder names (lib/config.ts). When
  * SEATLAYER_SECRET_KEY is present it reads each event's real name with the
  * Node server SDK. A secret key only ever exists in a route handler like this
  * one: it is never sent to the browser, never logged, and never put in a
@@ -21,11 +21,7 @@ export interface EventOption {
  * Events API: https://docs.seatlayer.io/server-api/events/
  * Node server SDK: https://docs.seatlayer.io/server-sdk/node/
  */
-const staticEvents: EventOption[] = [
-  { key: eventKey, name: "Opening night" },
-  { key: process.env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY_2 || eventKey, name: "Saturday matinee" },
-  { key: process.env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY_3 || eventKey, name: "Closing night" },
-];
+const staticEvents: EventOption[] = configuredEvents;
 
 export async function GET() {
   const secretKey = process.env.SEATLAYER_SECRET_KEY;
