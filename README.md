@@ -144,7 +144,7 @@ you a production build on any Node host.
 `SeatingChart`, the map alone for your own UI, and `SeasonPicker` for season
 tickets, with live availability, seat holds, best available and, on every plan,
 a 3D view from each seat for venues up to 60,000 seats. A 200,000-seat stadium
-chart is ready in 1.95 s, and you pay only for sold seats: 100 a month are free,
+chart is ready in 1.95 s on desktop, and you pay only for sold seats: 100 a month are free,
 then 10 cents down to 5 cents a seat. The routes in this repository run each of
 them with your own keys, and the control room route shows `SeatManager`, the
 staff board.
