@@ -5,6 +5,17 @@
 export const eventKey = process.env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY ?? "";
 export const publicKey = process.env.NEXT_PUBLIC_SEATLAYER_PUBLIC_KEY ?? "";
 
+/**
+ * The events on the multiple events page, with placeholder names. The keys are
+ * public, so the page draws the first map straight away; the server route
+ * replaces the names with the real ones when it answers.
+ */
+export const configuredEvents: { key: string; name: string }[] = [
+  { key: eventKey, name: "Opening night" },
+  { key: process.env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY_2 || eventKey, name: "Saturday matinee" },
+  { key: process.env.NEXT_PUBLIC_SEATLAYER_EVENT_KEY_3 || eventKey, name: "Closing night" },
+];
+
 /** A published Season key (sea_...) for the season tickets route. Optional. */
 export const seasonKey = process.env.NEXT_PUBLIC_SEATLAYER_SEASON_KEY ?? "";
 
