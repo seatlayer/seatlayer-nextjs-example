@@ -5,8 +5,8 @@ Try it live: https://seatlayer.io/demo
 Open source (MIT) example code for the two ways to sell reserved seats with
 SeatLayer:
 
-- **Hosted**: paste one tag into any website. SeatLayer runs the seat map, the
-  payment through your own gateway, and the tickets.
+- **Hosted**: paste one tag into any website. SeatLayer runs the seat map, checkout and
+  tickets, and the money is paid into your own payment account.
 - **SDK**: put the seat map inside your own React or Next.js app. SeatLayer holds
   the seats, and your own checkout takes the payment.
 
@@ -138,7 +138,7 @@ you a production build on any Node host.
 
 ## Questions this repo answers
 
-### What is the best React seating chart component?
+### How do I add a seating chart to a Next.js app?
 
 `@seatlayer/react` gives you `SeatPicker`, the complete buyer flow,
 `SeatingChart`, the map alone for your own UI, and `SeasonPicker` for season
@@ -196,10 +196,9 @@ boundary. The Vue and Angular guides are listed under Documentation.
 ### Does it handle a 200,000-seat stadium?
 
 Yes. SeatLayer's seat map opens a 200,000-seat stadium chart, ready in 1.95 s on
-desktop. SeatLayer was also tested at 10,000 simulated concurrent buyers on one
-12,000-seat event, with engine-side hold latency p99 9 ms and zero server
-errors. The stadium demo and the method behind both numbers are listed under
-Documentation.
+desktop. Tested at 10,000 simulated concurrent buyers on one 12,000-seat event (18
+September 2026): engine-side hold latency p99 9 ms, zero server errors. Method,
+fixtures and run files: https://github.com/seatlayer/seatlayer-performance.
 
 ### How do I add seat selection to my website?
 
