@@ -19,9 +19,6 @@ interface SeasonWidgetProps {
 /**
  * The fixed-inclusion Season buyer journey. One choice of seats covers every
  * performance in the published plan, and the hold is all or nothing.
- *
- * `offer` is optional presentation only. Prices are never taken from it: the
- * package price is confirmed by your server at checkout.
  */
 export const SeasonWidget = forwardRef<SeasonPickerHandle, SeasonWidgetProps>(function SeasonWidget(
   { onStatusChange, onHandoff, onHoldExpired, onError },
@@ -34,11 +31,6 @@ export const SeasonWidget = forwardRef<SeasonPickerHandle, SeasonWidgetProps>(fu
       publicKey={publicKey}
       maxSelection={4}
       className="seatmap seatmap--season"
-      offer={{
-        eyebrow: "Season package",
-        priceNote: "The package price depends on your seats and is confirmed at checkout",
-        benefits: ["The same seat for every performance", "One checkout for the whole season"],
-      }}
       onStatusChange={onStatusChange}
       onHold={onHandoff}
       onContinue={onHandoff}
