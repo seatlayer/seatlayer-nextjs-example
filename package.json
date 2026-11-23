@@ -21,14 +21,14 @@
   ],
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start"
   },
   "dependencies": {
     "@seatlayer/react": "1.0.0",
     "@seatlayer/server": "^0.8.0",
-    "next": "15.5.26",
+    "next": "16.4.6",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
